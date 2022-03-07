@@ -1,0 +1,29 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-version:
+      docker: 18
+      nodejs: 10
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - aws --version
+      - aws ecr get-login-password --region sa-east-1 | docker login --username AWS --password-stdin 454743731855.dkr.ecr.sa-east-1.amazonaws.com
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Building the Docker image...
+      - docker build --build-arg NODE_ENV=${NODE_ENV} --build-arg POSTGRES_HOST=${POSTGRES_HOST} --build-arg POSTGRES_PORT=${POSTGRES_PORT} --build-arg POSTGRES_USER=${POSTGRES_USER} --build-arg POSTGRES_PASSWORD=${POSTGRES_PASSWORD} --build-arg POSTGRES_DATABASE=${POSTGRES_DATABASE} -t 454743731855.dkr.ecr.sa-east-1.amazonaws.com/${S3}:latest .
+      - docker tag 454743731855.dkr.ecr.sa-east-1.amazonaws.com/${S3}:latest 454743731855.dkr.ecr.sa-east-1.amazonaws.com/${S3}:latest
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Docker images...
+      - docker push 454743731855.dkr.ecr.sa-east-1.amazonaws.com/${S3}:latest
+      - echo Writing image definitions file...
+      - printf '[{"name":"%s","imageUri":"%s"}]' ${S3} 454743731855.dkr.ecr.sa-east-1.amazonaws.com/${S3}:latest > imagedefinitions.json
+      - cat imagedefinitions.json
+artifacts:
+  files:
+    - imagedefinitions.json

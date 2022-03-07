@@ -1,0 +1,36 @@
+FROM node
+
+WORKDIR /usr/app
+
+COPY package.json ./
+
+RUN npm install
+
+ARG NODE_ENV
+ARG POSTGRES_HOST
+ARG POSTGRES_PORT
+ARG POSTGRES_USER
+ARG POSTGRES_PASSWORD
+ARG POSTGRES_DATABASE
+
+ENV NODE_ENV $NODE_ENV
+ENV POSTGRES_HOST $POSTGRES_HOST
+ENV POSTGRES_PORT $POSTGRES_PORT
+ENV POSTGRES_USER $POSTGRES_USER
+ENV POSTGRES_PASSWORD $POSTGRES_PASSWORD
+ENV POSTGRES_DATABASE $POSTGRES_DATABASE
+
+COPY . .
+
+RUN npm set progress=false && npm config set depth 0 && npm cache clean --force
+
+RUN npm run build
+
+# Migration
+# RUN npm run typeorm migration:run
+
+# RUN npm run seed
+
+EXPOSE 3001
+
+CMD ["npm","run","production"]

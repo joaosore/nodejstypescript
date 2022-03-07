@@ -1,0 +1,22 @@
+variables:
+  S3: '$HOMOLOGATION_S3'
+
+workflow:
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "master"
+      variables:
+        S3: '$PRODUCTION_S3'
+    - when: always
+
+dockerbuild:
+  stage: deploy
+  image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
+  script:
+    - apt-get update
+    - apt-get install -y zip unzip
+    - zip -r build.zip * .sequelizerc Dockerfile buildspec.yml .env.exemple
+    - aws configure set default.region $AWS_DEFAULT_REGION
+    - aws s3 cp build.zip s3://$S3/builds/build.zip
+  only:
+    - homolog
+    - master
