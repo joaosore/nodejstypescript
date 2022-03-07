@@ -1,1 +1,32 @@
 # nodejstypescript
+
+
+### INSTALL DEPENDENCIES
+
+yarn install
+
+
+### START PROJECT
+
+yarn dev
+
+
+### START DB
+
+docker-compose up -d
+
+
+### ENV
+
+NODE_ENV=
+
+POSTGRESQL_HOST=
+
+POSTGRESQL_PORT=
+
+POSTGRESQL_USER=
+
+POSTGRESQL_PASSWORD=
+
+POSTGRESQL_DATABASE=
+
